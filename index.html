@@ -50,8 +50,15 @@ body {
   max-width: 75%;
   padding: 12px 15px;
   border-radius: 18px;
-  font-size: 14px;
-  animation: fadeIn 0.3s ease;
+  font-size: 15px;
+  animation: fadeIn 1.6s ease;
+  line-height: 1.6;
+}
+.message b {
+  display: block;
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .user {
@@ -243,7 +250,7 @@ async function sendMessage() {
 
     // image card
     const lowerMsg = message.toLowerCase();
-    
+
     // 📸 ถ้าขอ "รูป"
 if (lowerMsg.includes("image") || lowerMsg.includes("photo") || lowerMsg.includes("รูป")) {
 
