@@ -170,8 +170,16 @@ function streamText(element, text) {
 
   function typing() {
     if (i < words.length) {
-      element.innerHTML += words[i] + " ";
+      let word = words[i];
+
+      // 🔥 จัด format
+      word = word
+        .replace(/\n/g, "<br>")
+        .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>"); // ทำ bold
+
+      element.innerHTML += word + " ";
       chatBox.scrollTop = chatBox.scrollHeight;
+
       i++;
       setTimeout(typing, 60);
     }
@@ -234,26 +242,45 @@ async function sendMessage() {
     streamText(botMsg, data.reply);
 
     // image card
-    setTimeout(() => {
-      const place = extractPlace(message);
+    const lowerMsg = message.toLowerCase();
+    
+    // 📸 ถ้าขอ "รูป"
+if (lowerMsg.includes("image") || lowerMsg.includes("photo") || lowerMsg.includes("รูป")) {
 
-      const card = document.createElement("div");
-      card.className = "image-card";
+  const place = message.replace(/image|photo|show|รูป/gi, "").trim();
 
-      card.innerHTML = `
-        <img src="${getImage(place)}" />
-        <div class="card-body">
-          📍 ${place}<br>
-          <a href="${getMapLink(place)}" target="_blank">
-            View on Google Maps →
-          </a>
-        </div>
-      `;
+  const card = document.createElement("div");
+  card.className = "image-card";
 
-      chatBox.appendChild(card);
-      chatBox.scrollTop = chatBox.scrollHeight;
+  card.innerHTML = `
+    <img src="https://source.unsplash.com/featured/?${place},travel" />
+    <div class="card-body">📍 ${place}</div>
+  `;
 
-    }, 1200);
+  chatBox.appendChild(card);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return;
+}
+
+// 🗺️ ถ้าขอ "แผนที่"
+if (lowerMsg.includes("map") || lowerMsg.includes("location") || lowerMsg.includes("แผนที่")) {
+
+  const place = message.replace(/map|location|show|แผนที่/gi, "").trim();
+
+  const map = document.createElement("div");
+  map.className = "message bot";
+
+  map.innerHTML = `
+    📍 ${place}<br>
+    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}" target="_blank">
+      Open in Google Maps →
+    </a>
+  `;
+
+  chatBox.appendChild(map);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return;
+}
 
   } catch (error) {
     loading.innerText = "Error connecting to server";
