@@ -7,7 +7,6 @@ CORS(app)
 
 import os
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
-print("CURRENT API KEY:", os.environ.get("GEMINI_API_KEY"))
 
 @app.route("/")
 def home():
