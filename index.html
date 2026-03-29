@@ -53,6 +53,38 @@ body {
   font-size: 14px;
   animation: fadeIn 0.3s ease;
 }
+.typing {
+  display: flex;
+  gap: 5px;
+}
+
+.typing span {
+  width: 8px;
+  height: 8px;
+  background: #2563eb;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite;
+}
+
+.typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+</style>
 
 .user {
   align-self: flex-end;
@@ -185,6 +217,21 @@ function getImage(place) {
 function getMapLink(place) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`;
 }
+function streamText(element, text) {
+  element.innerHTML = "";
+  const words = text.split(" ");
+  let i = 0;
+
+  function typing() {
+    if (i < words.length) {
+      element.innerHTML += words[i] + " ";
+      i++;
+      setTimeout(typing, 80); // ปรับความเร็วได้
+    }
+  }
+
+  typing();
+}
 
 async function sendMessage() {
   const input = document.getElementById("userInput");
@@ -204,7 +251,11 @@ async function sendMessage() {
   // loading
   const loading = document.createElement("div");
   loading.className = "message bot";
-  loading.innerText = "✈️ Thinking...";
+  loading.innerHTML = `
+  <div class="typing">
+    <span></span><span></span><span></span>
+  </div>
+`;
   chatBox.appendChild(loading);
 
   chatBox.scrollTop = chatBox.scrollHeight;
@@ -226,7 +277,7 @@ async function sendMessage() {
     botMsg.className = "message bot";
     chatBox.appendChild(botMsg);
 
-    typeText(botMsg, data.reply);
+    streamText(botMsg, data.reply);
 
     // image + map card
     const place = extractPlace(message);
