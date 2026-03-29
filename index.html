@@ -1,154 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI Travel Guide ✈️</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask AI Travel Guide</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6, #60a5fa);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to bottom, #e6f2ff, #ffffff);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+.chat-container {
+  width: 420px;
+  height: 700px;
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.15);
+  border-radius: 25px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-    header {
-      padding: 16px;
-      background: #007bff;
-      color: white;
-      font-weight: 600;
-      text-align: center;
-      font-size: 18px;
-    }
+.header {
+  padding: 18px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  font-size: 18px;
+}
 
-    #chat {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+.chat-box {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-    .bubble {
-      max-width: 75%;
-      padding: 12px 14px;
-      border-radius: 16px;
-      line-height: 1.4;
-      font-size: 14px;
-      white-space: pre-line;
-    }
+.message {
+  max-width: 75%;
+  padding: 12px 15px;
+  border-radius: 18px;
+  font-size: 14px;
+  animation: fadeIn 0.3s ease;
+}
 
-    .user {
-      align-self: flex-end;
-      background: #007bff;
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
+.user {
+  align-self: flex-end;
+  background: #2563eb;
+  color: white;
+}
 
-    .bot {
-      align-self: flex-start;
-      background: #f1f1f1;
-      color: #333;
-      border-bottom-left-radius: 4px;
-    }
+.bot {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.9);
+}
 
-    .typing {
-      font-style: italic;
-      color: gray;
-      font-size: 13px;
-    }
+.image-card {
+  width: 220px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
 
-    .input-area {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #ddd;
-      background: white;
-    }
+.image-card img {
+  width: 100%;
+  display: block;
+}
 
-    input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-      outline: none;
-    }
+.card-body {
+  padding: 8px;
+  font-size: 13px;
+}
 
-    button {
-      margin-left: 10px;
-      padding: 12px 18px;
-      border: none;
-      border-radius: 10px;
-      background: #007bff;
-      color: white;
-      font-weight: 500;
-      cursor: pointer;
-    }
+.card-body a {
+  color: #2563eb;
+  text-decoration: none;
+}
 
-    button:hover {
-      background: #0056b3;
-    }
-  </style>
+.input-container {
+  display: flex;
+  padding: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  margin-left: 10px;
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+@keyframes blink {
+  0% {opacity: 1;}
+  50% {opacity: 0;}
+  100% {opacity: 1;}
+}
+
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(5px);}
+  to {opacity:1; transform:translateY(0);}
+}
+</style>
 </head>
 
 <body>
 
-<header>
-  AI Travel Guide ✈️
-</header>
+<div class="chat-container">
+  <div class="header">🌍 AI Travel Guide ✈️</div>
 
-<div id="chat"></div>
+  <div class="chat-box" id="chatBox">
+    <div class="message bot">
+      Hello! I'm your AI travel guide. 😊<br>Where would you like to explore today?
+    </div>
+  </div>
 
-<div class="input-area">
-  <input id="input" placeholder="Ask me where to go..." />
-  <button onclick="sendMessage()">Send</button>
+  <div class="input-container">
+    <input id="userInput" placeholder="Ask about travel..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
 </div>
 
 <script>
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
+// typing effect
+function typeText(element, text) {
+  element.innerHTML = "";
+  let i = 0;
 
-// ✅ เพิ่มข้อความต้อนรับ
-window.onload = () => {
-  addMessage("Hello! I'm your AI travel guide. 😊\nWhere would you like to explore today?", "bot");
-};
+  const cursor = document.createElement("span");
+  cursor.innerHTML = "|";
+  cursor.style.animation = "blink 1s infinite";
 
-function addMessage(text, sender) {
-  const div = document.createElement("div");
-  div.classList.add("bubble", sender);
-  div.innerText = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+  element.appendChild(cursor);
+
+  function typing() {
+    if (i < text.length) {
+      const char = text.charAt(i);
+      if (char === "\n") {
+        cursor.insertAdjacentHTML("beforebegin", "<br>");
+      } else {
+        cursor.insertAdjacentText("beforebegin", char);
+      }
+      i++;
+      setTimeout(typing, Math.random() * 20 + 10);
+    } else {
+      cursor.remove();
+    }
+  }
+
+  typing();
 }
 
-function showTyping() {
-  const div = document.createElement("div");
-  div.classList.add("typing");
-  div.id = "typing";
-  div.innerText = "AI is typing...";
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+// extract place
+function extractPlace(text) {
+  const words = text.split(" ");
+  return words.slice(0, 2).join(" ");
 }
 
-function removeTyping() {
-  const typing = document.getElementById("typing");
-  if (typing) typing.remove();
+// image
+function getImage(place) {
+  return `https://source.unsplash.com/featured/?${place},travel`;
+}
+
+// map link
+function getMapLink(place) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`;
 }
 
 async function sendMessage() {
+  const input = document.getElementById("userInput");
+  const chatBox = document.getElementById("chatBox");
+
   const message = input.value.trim();
   if (!message) return;
 
-  addMessage(message, "user");
+  // user message
+  const userMsg = document.createElement("div");
+  userMsg.className = "message user";
+  userMsg.innerText = message;
+  chatBox.appendChild(userMsg);
+
   input.value = "";
 
-  showTyping();
+  // loading
+  const loading = document.createElement("div");
+  loading.className = "message bot";
+  loading.innerText = "✈️ Thinking...";
+  chatBox.appendChild(loading);
+
+  chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
     const res = await fetch("https://ai-travel-chatbot.onrender.com/chat", {
@@ -160,21 +218,41 @@ async function sendMessage() {
     });
 
     const data = await res.json();
+    loading.remove();
 
-    removeTyping();
-    addMessage(data.reply, "bot");
+    // bot message
+    const botMsg = document.createElement("div");
+    botMsg.className = "message bot";
+    chatBox.appendChild(botMsg);
+
+    typeText(botMsg, data.reply);
+
+    // image + map card
+    const place = extractPlace(message);
+
+    const card = document.createElement("div");
+    card.className = "image-card";
+
+    card.innerHTML = `
+      <img src="${getImage(place)}" />
+      <div class="card-body">
+        <div>📍 ${place}</div>
+        <a href="${getMapLink(place)}" target="_blank">View on Google Maps →</a>
+      </div>
+    `;
+
+    chatBox.appendChild(card);
 
   } catch (err) {
-    removeTyping();
-    addMessage("Something went wrong 😢", "bot");
+    loading.innerText = "⚠️ Server waking up...";
   }
+
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// ✅ กด Enter ส่งได้เลย
-input.addEventListener("keypress", function(e) {
-  if (e.key === "Enter") {
-    sendMessage();
-  }
+// enter to send
+document.getElementById("userInput").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") sendMessage();
 });
 </script>
 
