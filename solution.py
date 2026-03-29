@@ -14,29 +14,44 @@ def home():
     return "AI Travel Chatbot is running!"
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_message = request.json.get("message")
-
-    prompt = f"""
-    You are a local travel guide.
-    Answer in short bullet points under 120 words.
-
-    User: {user_message}
-    """
-
     try:
+        user_message = request.json.get("message")
+
+        print("USER:", user_message)
+
+        prompt = f"""
+        You are a local travel guide.
+        Answer in short bullet points under 120 words.
+
+        User: {user_message}
+        """
+
+        print("PROMPT:", prompt)
+
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt
-    )
-        reply = response.text
+        )
+
+        print("RAW RESPONSE:", response)
+
+        # ดึง text แบบปลอดภัย
+        try:
+            reply = response.text
+        except:
+            reply = response.candidates[0].content.parts[0].text
+
+        print("FINAL REPLY:", reply)
+
+        return jsonify({
+            "reply": reply
+        })
 
     except Exception as e:
-        print("ERROR:", e)
-        reply = "Please try again in a moment."
-
-    return jsonify({
-        "reply": reply
-    })
+        print("ERROR:", str(e))
+        return jsonify({
+            "reply": f"Error: {str(e)}"
+        })
 
 import os
 
