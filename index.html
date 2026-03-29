@@ -323,8 +323,11 @@ async function sendMessage() {
 }
 
 // enter to send
-document.getElementById("userInput").addEventListener("keypress", function(e) {
-  if (e.key === "Enter") sendMessage();
+document.getElementById("userInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    sendMessage();
+  }
 });
 </script>
 
