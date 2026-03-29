@@ -53,6 +53,19 @@ body {
   font-size: 14px;
   animation: fadeIn 0.3s ease;
 }
+
+.user {
+  align-self: flex-end;
+  background: #2563eb;
+  color: white;
+}
+
+.bot {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.9);
+}
+
+/* typing dots */
 .typing {
   display: flex;
   gap: 5px;
@@ -66,36 +79,15 @@ body {
   animation: bounce 1.4s infinite;
 }
 
-.typing span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing span:nth-child(3) {
-  animation-delay: 0.4s;
-}
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes bounce {
-  0%, 80%, 100% {
-    transform: translateY(0);
-    opacity: 0.5;
-  }
-  40% {
-    transform: translateY(-6px);
-    opacity: 1;
-  }
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40% { transform: translateY(-6px); opacity: 1; }
 }
 
-.user {
-  align-self: flex-end;
-  background: #2563eb;
-  color: white;
-}
-
-.bot {
-  align-self: flex-start;
-  background: rgba(255,255,255,0.9);
-}
-
+/* image card */
 .image-card {
   width: 220px;
   border-radius: 14px;
@@ -110,7 +102,7 @@ body {
 }
 
 .card-body {
-  padding: 20px;
+  padding: 10px;
   font-size: 13px;
 }
 
@@ -141,12 +133,6 @@ button {
   cursor: pointer;
 }
 
-@keyframes blink {
-  0% {opacity: 1;}
-  50% {opacity: 0;}
-  100% {opacity: 1;}
-}
-
 @keyframes fadeIn {
   from {opacity:0; transform:translateY(5px);}
   to {opacity:1; transform:translateY(0);}
@@ -161,7 +147,8 @@ button {
 
   <div class="chat-box" id="chatBox">
     <div class="message bot">
-      Hello! I'm your AI travel guide. 😊<br>Where would you like to explore today?
+      Hello! I'm your AI travel guide 😊<br>
+      Where would you like to explore today?
     </div>
   </div>
 
@@ -172,50 +159,10 @@ button {
 </div>
 
 <script>
-// typing effect
-function typeText(element, text) {
-  element.innerHTML = "";
-  let i = 0;
 
-  const cursor = document.createElement("span");
-  cursor.innerHTML = "|";
-  cursor.style.animation = "blink 1s infinite";
+const chatBox = document.getElementById("chatBox");
 
-  element.appendChild(cursor);
-
-  function typing() {
-    if (i < text.length) {
-      const char = text.charAt(i);
-      if (char === "\n") {
-        cursor.insertAdjacentHTML("beforebegin", "<br>");
-      } else {
-        cursor.insertAdjacentText("beforebegin", char);
-      }
-      i++;
-      setTimeout(typing, Math.random() * 20 + 10);
-    } else {
-      cursor.remove();
-    }
-  }
-
-  typing();
-}
-
-// extract place
-function extractPlace(text) {
-  const words = text.split(" ");
-  return words.slice(0, 2).join(" ");
-}
-
-// image
-function getImage(place) {
-  return `https://source.unsplash.com/featured/?${place},travel`;
-}
-
-// map link
-function getMapLink(place) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`;
-}
+// typing effect (word by word)
 function streamText(element, text) {
   element.innerHTML = "";
   const words = text.split(" ");
@@ -224,20 +171,35 @@ function streamText(element, text) {
   function typing() {
     if (i < words.length) {
       element.innerHTML += words[i] + " ";
+      chatBox.scrollTop = chatBox.scrollHeight;
       i++;
-      setTimeout(typing, 80); // ปรับความเร็วได้
+      setTimeout(typing, 60);
     }
   }
 
   typing();
 }
 
+// helper
+function extractPlace(text) {
+  return text.split(" ").slice(0, 2).join(" ");
+}
+
+function getImage(place) {
+  return `https://source.unsplash.com/featured/?${place},travel`;
+}
+
+function getMapLink(place) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`;
+}
+
+// MAIN FUNCTION
 async function sendMessage() {
   const input = document.getElementById("userInput");
   const message = input.value.trim();
   if (!message) return;
 
-  // 🧑 user message
+  // user msg
   const userMsg = document.createElement("div");
   userMsg.className = "message user";
   userMsg.innerText = message;
@@ -245,10 +207,10 @@ async function sendMessage() {
 
   input.value = "";
 
-  // 🤖 loading
+  // typing dots
   const loading = document.createElement("div");
-  loading.className = "message bot";
-  loading.innerText = "Thinking...";
+  loading.className = "message bot typing";
+  loading.innerHTML = "<span></span><span></span><span></span>";
   chatBox.appendChild(loading);
 
   try {
@@ -260,30 +222,29 @@ async function sendMessage() {
       body: JSON.stringify({ message })
     });
 
-    const data = await res.json(); // ✅ ต้องมาก่อน
+    const data = await res.json();
 
     loading.remove();
 
-    // 🤖 bot message
+    // bot msg
     const botMsg = document.createElement("div");
     botMsg.className = "message bot";
     chatBox.appendChild(botMsg);
 
-    // ✨ typing effect
-    streamText(botMsg, data.reply, chatBox);
+    streamText(botMsg, data.reply);
 
-    // 🖼️ image + map
+    // image card
     setTimeout(() => {
-      const place = message.split(" ").slice(0, 2).join(" ");
+      const place = extractPlace(message);
 
       const card = document.createElement("div");
       card.className = "image-card";
 
       card.innerHTML = `
-        <img src="https://source.unsplash.com/featured/?${place},travel" />
+        <img src="${getImage(place)}" />
         <div class="card-body">
           📍 ${place}<br>
-          <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}" target="_blank">
+          <a href="${getMapLink(place)}" target="_blank">
             View on Google Maps →
           </a>
         </div>
@@ -292,43 +253,21 @@ async function sendMessage() {
       chatBox.appendChild(card);
       chatBox.scrollTop = chatBox.scrollHeight;
 
-    }, 1800);
+    }, 1200);
 
   } catch (error) {
     loading.innerText = "Error connecting to server";
   }
 }
 
-    // image + map card
-    const place = extractPlace(message);
-
-    const card = document.createElement("div");
-    card.className = "image-card";
-
-    card.innerHTML = `
-      <img src="${getImage(place)}" />
-      <div class="card-body">
-        <div>📍 ${place}</div>
-        <a href="${getMapLink(place)}" target="_blank">View on Google Maps →</a>
-      </div>
-    `;
-
-    chatBox.appendChild(card);
-
-  } catch (err) {
-    loading.innerText = "⚠️ Server waking up...";
-  }
-
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// enter to send
+// ENTER KEY FIX (สำคัญมาก)
 document.getElementById("userInput").addEventListener("keydown", function(e) {
   if (e.key === "Enter") {
     e.preventDefault();
     sendMessage();
   }
 });
+
 </script>
 
 </body>
