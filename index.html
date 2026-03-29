@@ -234,12 +234,10 @@ function streamText(element, text) {
 
 async function sendMessage() {
   const input = document.getElementById("userInput");
-  const chatBox = document.getElementById("chatBox");
-
   const message = input.value.trim();
   if (!message) return;
 
-  // user message
+  // 🧑 user message
   const userMsg = document.createElement("div");
   userMsg.className = "message user";
   userMsg.innerText = message;
@@ -247,20 +245,14 @@ async function sendMessage() {
 
   input.value = "";
 
-  // loading
+  // 🤖 loading
   const loading = document.createElement("div");
   loading.className = "message bot";
-  loading.innerHTML = `
-  <div class="typing">
-    <span></span><span></span><span></span>
-  </div>
-`;
+  loading.innerText = "Thinking...";
   chatBox.appendChild(loading);
 
-  chatBox.scrollTop = chatBox.scrollHeight;
-
   try {
-    const res = await fetch("https://ai-travel-chatbot.onrender.com/chat", {
+    const res = await fetch("/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -268,44 +260,44 @@ async function sendMessage() {
       body: JSON.stringify({ message })
     });
 
-    const data = await res.json();
+    const data = await res.json(); // ✅ ต้องมาก่อน
+
     loading.remove();
 
-    // bot message
+    // 🤖 bot message
     const botMsg = document.createElement("div");
     botMsg.className = "message bot";
     chatBox.appendChild(botMsg);
 
-    streamText(botMsg, data.reply);
-    const data = await res.json();
-loading.remove();
+    // ✨ typing effect
+    streamText(botMsg, data.reply, chatBox);
 
-// bot message
-const botMsg = document.createElement("div");
-botMsg.className = "message bot";
-chatBox.appendChild(botMsg);
+    // 🖼️ image + map
+    setTimeout(() => {
+      const place = message.split(" ").slice(0, 2).join(" ");
 
-streamText(botMsg, data.reply, chatBox);
-setTimeout(() => {
-  const place = message.split(" ").slice(0, 2).join(" ");
+      const card = document.createElement("div");
+      card.className = "image-card";
 
-  const card = document.createElement("div");
-  card.className = "image-card";
+      card.innerHTML = `
+        <img src="https://source.unsplash.com/featured/?${place},travel" />
+        <div class="card-body">
+          📍 ${place}<br>
+          <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}" target="_blank">
+            View on Google Maps →
+          </a>
+        </div>
+      `;
 
-  card.innerHTML = `
-    <img src="https://source.unsplash.com/featured/?${place},travel" />
-    <div class="card-body">
-      📍 ${place}<br>
-      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}" target="_blank">
-        View on Google Maps →
-      </a>
-    </div>
-  `;
+      chatBox.appendChild(card);
+      chatBox.scrollTop = chatBox.scrollHeight;
 
-  chatBox.appendChild(card);
-  chatBox.scrollTop = chatBox.scrollHeight;
+    }, 1800);
 
-}, 1800);
+  } catch (error) {
+    loading.innerText = "Error connecting to server";
+  }
+}
 
     // image + map card
     const place = extractPlace(message);
