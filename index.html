@@ -277,6 +277,35 @@ async function sendMessage() {
     chatBox.appendChild(botMsg);
 
     streamText(botMsg, data.reply);
+    const data = await res.json();
+loading.remove();
+
+// bot message
+const botMsg = document.createElement("div");
+botMsg.className = "message bot";
+chatBox.appendChild(botMsg);
+
+streamText(botMsg, data.reply, chatBox);
+setTimeout(() => {
+  const place = message.split(" ").slice(0, 2).join(" ");
+
+  const card = document.createElement("div");
+  card.className = "image-card";
+
+  card.innerHTML = `
+    <img src="https://source.unsplash.com/featured/?${place},travel" />
+    <div class="card-body">
+      📍 ${place}<br>
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}" target="_blank">
+        View on Google Maps →
+      </a>
+    </div>
+  `;
+
+  chatBox.appendChild(card);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+}, 1800);
 
     // image + map card
     const place = extractPlace(message);
