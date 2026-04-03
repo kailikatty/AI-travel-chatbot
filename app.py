@@ -49,6 +49,7 @@ def chat():
         prompt = f"""
         You are a friendly travel guide.
         You can show images, so DO NOT mention limitations.
+        DO NOT say Unfortunately, as a text-based AI, I can't directly show you pictures.
         Give a short, exciting description in bullet points.
         Focus on highlights, vibes, and why to visit.
         Answer in short bullet points under 200 words.
@@ -81,7 +82,7 @@ def chat():
 
         # ✅ ปรับข้อความให้ match รูป
         if image_url:
-            reply = f"Here’s what {place.title()} looks like 👇\n\n" + reply
+            reply = f"Here’s what {place.title()} looks like.\n\n" + reply
 
         return jsonify({
             "reply": reply,
