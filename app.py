@@ -46,20 +46,20 @@ def chat():
     "image", "images", "picture", "pictures", "show"
 ])
 
-if show_image:
-    place = user_message.lower()
-    place = place.replace("show me pictures of", "")
-    place = place.replace("show me picture of", "")
-    place = place.replace("pictures of", "")
-    place = place.replace("picture of", "")
-    place = place.strip()
+        if show_image:
+            place = user_message.lower()
+            place = place.replace("show me pictures of", "")
+            place = place.replace("show me picture of", "")
+            place = place.replace("pictures of", "")
+            place = place.replace("picture of", "")
+            place = place.strip()
 
-    return jsonify({
-        "reply": reply,
-        "image": f"https://source.unsplash.com/featured/?{place},travel"
+            return jsonify({
+                "reply": reply,
+                "image": f"https://source.unsplash.com/featured/?{place},travel"
     })
 
-return jsonify({
+        return jsonify({
     "reply": reply
 })
 
