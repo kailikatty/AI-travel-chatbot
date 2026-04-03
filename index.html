@@ -241,6 +241,18 @@ async function sendMessage() {
 
     loading.remove();
 
+    if (data.image) {
+  const card = document.createElement("div");
+  card.className = "image-card";
+
+  card.innerHTML = `
+    <img src="${data.image}" />
+    <div class="card-body">📍 ${message}</div>
+  `;
+
+  chatBox.appendChild(card);
+}
+
     // bot msg
     const botMsg = document.createElement("div");
     botMsg.className = "message bot";
@@ -252,9 +264,16 @@ async function sendMessage() {
     const lowerMsg = message.toLowerCase();
 
     // 📸 ถ้าขอ "รูป"
-if (lowerMsg.includes("image") || lowerMsg.includes("photo") || lowerMsg.includes("รูป")) {
-
-  const place = message.replace(/image|photo|show|รูป/gi, "").trim();
+if (
+  lowerMsg.includes("image") ||
+  lowerMsg.includes("photo") ||
+  lowerMsg.includes("picture") ||
+  lowerMsg.includes("pictures") ||
+  lowerMsg.includes("show")
+)
+  const place = message
+  .replace(/show|me|pictures|picture|image|photo|of/gi, "")
+  .trim(); 
 
   const card = document.createElement("div");
   card.className = "image-card";
