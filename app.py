@@ -56,7 +56,7 @@ def chat():
 
             return jsonify({
                 "reply": reply,
-                "image": f"https://source.unsplash.com/featured/?{place},travel"
+                image_url = f"https://picsum.photos/800/600?random={place}"
     })
 
         return jsonify({
