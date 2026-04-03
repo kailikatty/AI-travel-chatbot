@@ -48,4 +48,4 @@ Backend
 🌐 Live Demo
 
 - Frontend (Vercel): https://ask-ai-guide.vercel.app
-- Backend API (Render): https://ai-travel-chatbot.onrender.com
+- Backend API (Render): https://ask-ai-guide.onrender.com
