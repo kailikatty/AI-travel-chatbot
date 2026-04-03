@@ -239,17 +239,9 @@ async function sendMessage() {
 
     const data = await res.json();
 
-loading.remove();
+    loading.remove();
 
-// ✅ แสดงข้อความก่อน
-const botMsg = document.createElement("div");
-botMsg.className = "message bot";
-chatBox.appendChild(botMsg);
-
-streamText(botMsg, data.reply);
-
-// ✅ แล้วค่อยแสดงรูป
-if (data.image) {
+    if (data.image) {
   const card = document.createElement("div");
   card.className = "image-card";
 
@@ -261,7 +253,40 @@ if (data.image) {
   chatBox.appendChild(card);
 }
 
-chatBox.scrollTop = chatBox.scrollHeight;
+    // bot msg
+    const botMsg = document.createElement("div");
+    botMsg.className = "message bot";
+    chatBox.appendChild(botMsg);
+
+    streamText(botMsg, data.reply);
+
+    // image card
+    const lowerMsg = message.toLowerCase();
+
+    // 📸 ถ้าขอ "รูป"
+if (
+  lowerMsg.includes("image") ||
+  lowerMsg.includes("photo") ||
+  lowerMsg.includes("picture") ||
+  lowerMsg.includes("pictures") ||
+  lowerMsg.includes("show")
+)
+  const place = message
+  .replace(/show|me|pictures|picture|image|photo|of/gi, "")
+  .trim(); 
+
+  const card = document.createElement("div");
+  card.className = "image-card";
+
+  card.innerHTML = `
+    <img src="https://source.unsplash.com/featured/?${place},travel" />
+    <div class="card-body">📍 ${place}</div>
+  `;
+
+  chatBox.appendChild(card);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return;
+}
 
 // 🗺️ ถ้าขอ "แผนที่"
 if (lowerMsg.includes("map") || lowerMsg.includes("location") || lowerMsg.includes("แผนที่")) {
