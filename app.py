@@ -47,7 +47,10 @@ def chat():
         print("USER:", user_message)
 
         prompt = f"""
-        You are a local travel guide.
+        You are a friendly travel guide.
+        You can show images, so DO NOT mention limitations.
+        Give a short, exciting description in bullet points.
+        Focus on highlights, vibes, and why to visit.
         Answer in short bullet points under 200 words.
 
         User: {user_message}
