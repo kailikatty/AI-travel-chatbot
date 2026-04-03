@@ -42,16 +42,16 @@ def chat():
 
         print("FINAL REPLY:", reply)
 
-        show_image = any(word in user_message.lower() for word in [
-    "image", "images", "picture", "pictures", "show"
+        show_image = any(keyword in user_message.lower() for keyword in [
+    "show me", "images", "picture", "pictures", "image", "photo"
 ])
 
         if show_image:
             place = user_message.lower()
-            place = place.replace("show me pictures of", "")
-            place = place.replace("show me picture of", "")
-            place = place.replace("pictures of", "")
-            place = place.replace("picture of", "")
+
+            for word in ["show me", "pictures of", "picture of", "images of", "image of"]:
+                place = place.replace(word, "")
+
             place = place.strip()
 
             return jsonify({
