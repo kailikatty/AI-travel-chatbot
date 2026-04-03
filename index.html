@@ -164,7 +164,6 @@ input.addEventListener("keydown", function(e) {
 
 // typing effect
 function streamText(element, text) {
-  element.innerHTML = "";
   const words = text.split(" ");
   let i = 0;
 
@@ -219,24 +218,20 @@ async function sendMessage() {
 
     loading.remove();
 
-    // ✅ แสดงรูป (มาจาก backend เท่านั้น)
-    if (data.image_url) {
-      const card = document.createElement("div");
-      card.className = "image-card";
-
-      card.innerHTML = `
-        <img src="${data.image_url}" />
-        <div class="card-body">📍 ${message}</div>
-      `;
-
-      chatBox.appendChild(card);
-    }
-
     // bot message
     const botMsg = document.createElement("div");
-    botMsg.className = "message bot";
+botMsg.className = "message bot";
+
+    // ✅ ใส่รูปก่อน (ถ้ามี)
+    if (data.image_url) {
+      botMsg.innerHTML = `
+        <img src="${data.image_url}" style="width:100%; border-radius:12px; margin-bottom:8px;" />
+      `;
+    }
+
     chatBox.appendChild(botMsg);
 
+    // แล้วค่อยใส่ข้อความ
     streamText(botMsg, data.reply);
 
     chatBox.scrollTop = chatBox.scrollHeight;
