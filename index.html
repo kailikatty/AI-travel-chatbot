@@ -51,14 +51,8 @@ body {
   padding: 12px 15px;
   border-radius: 18px;
   font-size: 15px;
-  animation: fadeIn 1.6s ease;
+  animation: fadeIn 0.5s ease;
   line-height: 1.6;
-}
-.message b {
-  display: block;
-  margin-top: 10px;
-  font-size: 15px;
-  font-weight: 600;
 }
 
 .user {
@@ -113,11 +107,6 @@ body {
   font-size: 13px;
 }
 
-.card-body a {
-  color: #2563eb;
-  text-decoration: none;
-}
-
 .input-container {
   display: flex;
   padding: 10px;
@@ -138,11 +127,6 @@ button {
   background: #2563eb;
   color: white;
   cursor: pointer;
-}
-
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(5px);}
-  to {opacity:1; transform:translateY(0);}
 }
 </style>
 </head>
@@ -168,8 +152,17 @@ button {
 <script>
 
 const chatBox = document.getElementById("chatBox");
+const input = document.getElementById("userInput");
 
-// typing effect (word by word)
+// ✅ ENTER FIX (สำคัญ)
+input.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// typing effect
 function streamText(element, text) {
   element.innerHTML = "";
   const words = text.split(" ");
@@ -179,42 +172,27 @@ function streamText(element, text) {
     if (i < words.length) {
       let word = words[i];
 
-      // 🔥 จัด format
       word = word
         .replace(/\n/g, "<br>")
-        .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>"); // ทำ bold
+        .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
 
       element.innerHTML += word + " ";
       chatBox.scrollTop = chatBox.scrollHeight;
 
       i++;
-      setTimeout(typing, 60);
+      setTimeout(typing, 40);
     }
   }
 
   typing();
 }
 
-// helper
-function extractPlace(text) {
-  return text.split(" ").slice(0, 2).join(" ");
-}
-
-function getImage(place) {
-  return `https://source.unsplash.com/featured/?${place},travel`;
-}
-
-function getMapLink(place) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`;
-}
-
 // MAIN FUNCTION
 async function sendMessage() {
-  const input = document.getElementById("userInput");
   const message = input.value.trim();
   if (!message) return;
 
-  // user msg
+  // user message
   const userMsg = document.createElement("div");
   userMsg.className = "message user";
   userMsg.innerText = message;
@@ -222,7 +200,7 @@ async function sendMessage() {
 
   input.value = "";
 
-  // typing dots
+  // loading
   const loading = document.createElement("div");
   loading.className = "message bot typing";
   loading.innerHTML = "<span></span><span></span><span></span>";
@@ -241,85 +219,32 @@ async function sendMessage() {
 
     loading.remove();
 
+    // ✅ แสดงรูป (มาจาก backend เท่านั้น)
     if (data.image) {
-  const card = document.createElement("div");
-  card.className = "image-card";
+      const card = document.createElement("div");
+      card.className = "image-card";
 
-  card.innerHTML = `
-    <img src="${data.image}" />
-    <div class="card-body">📍 ${message}</div>
-  `;
+      card.innerHTML = `
+        <img src="${data.image}" />
+        <div class="card-body">📍 ${message}</div>
+      `;
 
-  chatBox.appendChild(card);
-}
+      chatBox.appendChild(card);
+    }
 
-    // bot msg
+    // bot message
     const botMsg = document.createElement("div");
     botMsg.className = "message bot";
     chatBox.appendChild(botMsg);
 
     streamText(botMsg, data.reply);
 
-    // image card
-    const lowerMsg = message.toLowerCase();
-
-    // 📸 ถ้าขอ "รูป"
-if (
-  lowerMsg.includes("image") ||
-  lowerMsg.includes("photo") ||
-  lowerMsg.includes("picture") ||
-  lowerMsg.includes("pictures") ||
-  lowerMsg.includes("show")
-)
-  const place = message
-  .replace(/show|me|pictures|picture|image|photo|of/gi, "")
-  .trim(); 
-
-  const card = document.createElement("div");
-  card.className = "image-card";
-
-  card.innerHTML = `
-    <img src="https://source.unsplash.com/featured/?${place},travel" />
-    <div class="card-body">📍 ${place}</div>
-  `;
-
-  chatBox.appendChild(card);
-  chatBox.scrollTop = chatBox.scrollHeight;
-  return;
-}
-
-// 🗺️ ถ้าขอ "แผนที่"
-if (lowerMsg.includes("map") || lowerMsg.includes("location") || lowerMsg.includes("แผนที่")) {
-
-  const place = message.replace(/map|location|show|แผนที่/gi, "").trim();
-
-  const map = document.createElement("div");
-  map.className = "message bot";
-
-  map.innerHTML = `
-    📍 ${place}<br>
-    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}" target="_blank">
-      Open in Google Maps →
-    </a>
-  `;
-
-  chatBox.appendChild(map);
-  chatBox.scrollTop = chatBox.scrollHeight;
-  return;
-}
+    chatBox.scrollTop = chatBox.scrollHeight;
 
   } catch (error) {
     loading.innerText = "Error connecting to server";
   }
 }
-
-// ENTER KEY FIX (สำคัญมาก)
-document.getElementById("userInput").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    sendMessage();
-  }
-});
 
 </script>
 
