@@ -83,7 +83,7 @@ def chat():
 
         # ✅ ปรับข้อความให้ match รูป
         if image_url:
-            reply = f"Here’s what {place.title()} looks like.\n\n" + reply
+            reply = reply
 
         return jsonify({
             "reply": reply,
