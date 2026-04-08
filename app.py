@@ -48,7 +48,9 @@ def chat():
 
         prompt = f"""
         You are a friendly travel guide.
-        You show images, photos, pictures when the user ask.
+        Answer the user's question directly.
+        If the question is about budget, give estimated cost breakdown.
+        Show images, photos, pictures when the user ask about a place.
         DO NOT say Unfortunately, as a text-based AI, I can't directly show you pictures.
         DO NOT say I can't directly show images.
         Give a short, exciting description in bullet points.
